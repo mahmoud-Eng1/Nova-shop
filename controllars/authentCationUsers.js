@@ -34,7 +34,7 @@ exports.register = asyncHandler( async (req, res, next)=> {
 createUser.password = undefined
 
 // access token
-const accessToken = createToken(createUser, process.env.ACCESS_TOKEN_SECRET, "7d")
+const accessToken = createToken(createUser, process.env.ACCESS_TOKEN_SECRET, "15m")
 
     //refresh token 
     const refreshToken = createToken(createUser, process.env.REFRESH_TOKEN_SECRET, "7d")
@@ -103,7 +103,7 @@ exports.refresh = asyncHandler( (req, res, next)=> {
                   // Generate a new access token for the user
              const accessToken = jwt.sign({userInfo: {id: user._id}},
             process.env.ACCESS_TOKEN_SECRET,
-             {expiresIn: "15"}
+             {expiresIn: "15m"}
             )
 
             return res.json({accessToken})

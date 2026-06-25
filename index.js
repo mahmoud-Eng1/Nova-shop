@@ -25,17 +25,14 @@ const couponRouter = require("./routes/couponRouter.js");
 const cartRouter = require("./routes/cartRouter.js");
 const orderRouter = require("./routes/orderRouter.js");
 const mongoose = require('mongoose'); 
-// const compression = require('compression')
-const {validateProduct, 
-  validationBrand, 
-  validationSubcategory,
-  validateUserJoi,
-  validateCouponJoi,
-  validateReviewJoi,
-} = require("./middlewares/joiMiddleware.js")
-
+const rateLimit = require("express-rate-limit")
+const hpp = require('hpp');
+ const compression = require('compression')
 const cors = require("cors");
 const morgan = require("morgan");
+const mongoSanitize = require('express-mongo-sanitize');
+const xss = require('xss-clean')
+
 const app = express();
 const port = 5500;
 
@@ -44,28 +41,45 @@ const port = 5500;
 app.use("/files", express.static(path.join(__dirname, "uploads")));
 app.use(cors(corsOptions));
 // Compress all HTTP responses to reduce payload size and improve performance
-// app.use(compression)
-app.use(express.json());
-app.set('query parser', 'extended');
-app.use(express.urlencoded({ extended: true }));
+ app.use(compression())
+app.use(express.json({limit: "20kb"}));
+app.use(express.urlencoded({ extended: true, limit: "20kb"}));
+
+// To remove data using these defaults:
+app.use(mongoSanitize());
+
+// make sure this comes before any routes
+app.use(xss())
+
+app.use(hpp());
+ // app.set('query parser', 'extended');
 app.use(express.static(path.join(__dirname, "public")));
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
+// Limit each IP to 100 requests per `window` (here, per 15 minutes).
+const limiter = rateLimit({
+	windowMs: 15 * 60 * 1000, // 15 minutes
+	limit: 100, 
+
+})
+app.use(limiter)
+
+
 //  routes
 
 app.use("/api/v1/", rootPage);
-app.use("/api/v1/category", validationBrand,categotyRouter);
-app.use("/api/v1/brand", validationBrand,brandRouter);
-app.use("/api/v1/subcategory", validationSubcategory,subCategotyRouter);
-app.use("/api/v1/product", productRouter);
-app.use("/api/v1/reviews", validateReviewJoi, reviewsRouter);
+app.use("/api/v1/category", categotyRouter);
+app.use("/api/v1/brand", brandRouter);
+app.use("/api/v1/subcategory",subCategotyRouter);
+app.use("/api/v1/product",productRouter);
+app.use("/api/v1/reviews", reviewsRouter);
 app.use("/api/v1/wishlist", wishListRouter);
 app.use("/api/v1/addresses", addressesRouter);
-app.use("/api/v1/coupon", validateCouponJoi, couponRouter);
+app.use("/api/v1/coupon", couponRouter);
 app.use("/api/v1/cart", cartRouter);
 app.use("/api/v1/orders", orderRouter);
-app.use("/api/v1/users", validateUserJoi, authentcation, users);
+app.use("/api/v1/auth", authentcation, users);
 
 app.all(/.*/, (req, res) => {
   res.status(404);

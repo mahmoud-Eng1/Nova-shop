@@ -24,11 +24,15 @@ const joi = require("joi")
    name: joi.string().required().min(3).max(32),
  })
 
- exports.joiUsersValidation = joi.object({
+ exports.joiregisterValidation = joi.object({
   first_name: joi.string().required(),
   last_name: joi.string().required(), 
   email: joi.string().required().email().trim(),
   password: joi.string().required().min(8).message("password is short must be above or equal 8")
+ })
+ exports.joiLoginValidation = joi.object({
+  email: joi.string().email().required().trim(),
+  password: joi.string().required(),
  })
 
 exports.joiCouponValidation = joi.object({

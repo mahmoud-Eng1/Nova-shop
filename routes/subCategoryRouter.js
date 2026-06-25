@@ -9,10 +9,11 @@ const {
     } = require("../controllars/subCategortController")
     const {jwtToken} = require("../middlewares/verifyToken");
 const allowedto = require("../middlewares/allowedTo");
+const {validationSubcategory} = require("../middlewares/joiMiddleware.js")
 // mergeParams => allow us to access other route
 const router = express.Router({mergeParams: true})
 
-router.post("/",jwtToken, allowedto("admin", "manager"), createSubCategory)
+router.post("/",jwtToken, allowedto("admin", "manager"), validationSubcategory, createSubCategory)
 router.get("/", getAllSubCategories)
 router.get("/:id", getSingleSubCategores)
 router.patch("/:id", jwtToken, allowedto("admin", "manager"), updateSubCategory)

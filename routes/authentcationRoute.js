@@ -2,7 +2,7 @@ const express = require("express")
 const router = express.Router();
 const {register, login, refresh,logOut, resetPassword,verifyPssResetCode, resetNewPass} = require("../controllars/authentcationUsers")
 const multer = require("multer")
-const {verifyAdmin} = require("../middlewares/verifyAdmin")
+const {validateRegisterJoi, validateLoginJoi} = require("../middlewares/joiMiddleware.js")
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -16,8 +16,8 @@ const storage = multer.diskStorage({
   
   const upload = multer({ storage: storage })
 
-router.post("/register",upload.single('image'), register)
-router.post("/login", login)
+router.post("/register",upload.single('image'), validateRegisterJoi, register)
+router.post("/login", validateLoginJoi, login)
 router.post("/logout", logOut)
 router.get("/refresh", refresh)
 router.post("/reset-password", resetPassword)

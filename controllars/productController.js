@@ -39,7 +39,9 @@ const createProduct = asyncHandler(async (req, res, next) => {
 const getAllProducts = asyncHandler(async (req, res, next) => {
 
 const numberOfCount = await Product.countDocuments()
-
+for(const key in req.query){
+  console.log(key, req.query)
+}
  const apiFeature = new ApiFeature(Product.find(), req.query).fields().filter().search().sort().paginate(numberOfCount)
  const {mongooseQuery,ResultPagination } = apiFeature
    const products = await mongooseQuery

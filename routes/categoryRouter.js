@@ -1,5 +1,4 @@
 const express = require("express");
-const {verifyAdmin} = require("../middlewares/verifyAdmin")
 const { createCategory,
     getAllCategories,
     getSingleCategores,
@@ -10,8 +9,9 @@ const subCategoryRouter = require("./subCategoryRouter")
 const allowedto = require("../middlewares/allowedTo")
 const router = express.Router();
 router.use("/:categoryId/subcategory", subCategoryRouter)
+const {validationBrand} = require("../middlewares/joiMiddleware.js")
 
-router.post("/", jwtToken, allowedto("admin", "manager") ,createCategory);
+router.post("/", jwtToken, allowedto("admin", "manager"), validationBrand, createCategory);
 router.get("/", jwtToken, allowedto("user","admin", "manager"), getAllCategories); 
 router.get("/:id", jwtToken, allowedto("user","admin", "manager"), getSingleCategores); 
 router.patch("/:id", jwtToken, allowedto("admin", "manager"), updateCategory); 

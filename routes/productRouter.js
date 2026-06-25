@@ -16,8 +16,22 @@ const multer = require("multer");
 const reviewsRouter = require("./reviewRouter");
 const { jwtToken } = require("../middlewares/verifyToken");
 const allowedto = require("../middlewares/allowedTo");
+const {validateProduct} = require("../middlewares/joiMiddleware.js")
+const AppError = require("../utils/AppErrors.js")
 
 const router = express.Router();
+
+// Prevent HTTP Parameter Pollution (HPP) by rejecting duplicate query parameters
+const preventDuplicateQueryParams = (req, res, next) => {
+  for (const key in req.query) {
+    if (Array.isArray(req.query[key])) {
+      return next(new AppError(`Duplicate query parameter ${key} is not allowed`, 400))
+    }
+  }
+
+  next();
+};
+
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "uploads");
@@ -35,6 +49,7 @@ router.get(
   "/",
   jwtToken,
   allowedto("user", "admin", "manager"),
+  preventDuplicateQueryParams,
   getAllProducts
 );
 router.post(
@@ -45,12 +60,14 @@ router.post(
   validate(productValidation),
   checkSubCategoriesBelongToCategory,
   validateSubCategoryIds,
+  validateProduct,
   createProduct
 );
 router.get(
   "/:id",
   jwtToken,
   allowedto("user", "admin", "manager"),
+  preventDuplicateQueryParams,
   getSingleProduct
 );
 router.patch(
