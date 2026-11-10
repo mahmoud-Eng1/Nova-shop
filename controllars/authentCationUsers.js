@@ -5,7 +5,7 @@ const jwt = require("jsonwebtoken")
 const { createHmac } = require('node:crypto');
 const sendEmail = require("../utils/sendEmail")
 const createToken = require("../utils/createToken")
-const asyncHandler = require("express-async-handler");
+const asyncHandler = require("express-async-handler"); 
 
 
 
@@ -156,7 +156,7 @@ try{
 
  sendEmail({
     email: user.email,
-    subject: "your password reset code (valid for 5 min)",
+     subject: "your password reset code (valid for 5 min)",
     message
  }) 
 }catch(err){

@@ -22,9 +22,7 @@ return this
   sort(){
     if(this.queryString.sort) {
       
-      // if(Array.isArray(this.queryString.sort)){
-      //   throw new AppError("Duplicate sort parameter is not allowed", 400);
-      // }
+      
       const sortQuery = this.queryString.sort.split(",").join(" ")
       
       this.mongooseQuery = this.mongooseQuery.sort(sortQuery)

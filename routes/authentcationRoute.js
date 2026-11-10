@@ -1,6 +1,6 @@
 const express = require("express")
 const router = express.Router();
-const {register, login, refresh,logOut, resetPassword,verifyPssResetCode, resetNewPass} = require("../controllars/authentcationUsers")
+const {register, login, refresh,logOut, resetPassword,verifyPssResetCode, resetNewPass} = require("../controllars/authentCationUsers")
 const multer = require("multer")
 const {validateRegisterJoi, validateLoginJoi} = require("../middlewares/joiMiddleware.js")
 

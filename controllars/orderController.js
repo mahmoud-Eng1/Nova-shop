@@ -78,7 +78,7 @@ exports.getAllOrders = asyncHandler( async (req, res, next)=>{
             result: orders.length,
             data: orders,
         })
-    } else {
+     } else {
         
         const userOrders = await Order.find({user: req.user});
         if(userOrders.length === 0) return next(new AppError("there is no orders for this user", 404));
