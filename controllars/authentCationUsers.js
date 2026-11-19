@@ -6,6 +6,7 @@ const { createHmac } = require('node:crypto');
 const sendEmail = require("../utils/sendEmail")
 const createToken = require("../utils/createToken")
 const asyncHandler = require("express-async-handler"); 
+const {uploadToCloudinary} = require("../utils/cloudinary")
 
 
 
@@ -15,9 +16,10 @@ const asyncHandler = require("express-async-handler");
 exports.register = asyncHandler( async (req, res, next)=> {
     const {first_name, last_name, password, email, confirm_password} = req.body
    
-    if(req.file){
-        req.body.image = req.file.filename
-    }
+   if (req.file) {
+  const result = await uploadToCloudinary(req.file.buffer, "users");
+  req.body.image = result.secure_url;
+}
     if(!first_name || !last_name || !email || !password || !confirm_password) return next(new AppError("all failds is required", 400))
         if(confirm_password !== password) return next(new AppError("confirm password dont match password", 400))
     const existUser = await Users.findOne({email}).exec() 

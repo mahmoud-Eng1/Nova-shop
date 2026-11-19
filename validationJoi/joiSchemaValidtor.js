@@ -1,4 +1,4 @@
-const joi = require("joi")
+const joi = require("../utils/customJoi");
 
  exports.productValidation = joi.object({
     title: joi.string().min(3).max(200).required(),
@@ -28,11 +28,19 @@ const joi = require("joi")
   first_name: joi.string().required(),
   last_name: joi.string().required(), 
   email: joi.string().required().email().trim(),
-  password: joi.string().required().min(8).message("password is short must be above or equal 8")
+  password: joi.string().required().min(8).message("password is short must be above or equal 8"),
+  confirm_password: joi.string()
+    .valid(joi.ref("password"))
+    .required()
+    .messages({
+      "any.only": "Passwords do not match",
+      "any.required": "Confirm password is required",
+    }),
  })
  exports.joiLoginValidation = joi.object({
   email: joi.string().email().required().trim(),
   password: joi.string().required(),
+  
  })
 
 exports.joiCouponValidation = joi.object({

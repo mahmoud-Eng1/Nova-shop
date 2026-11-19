@@ -5,7 +5,7 @@ const AppErrors = require("../utils/AppErrors");
 const Category = require("../models/categorySchema")
 const SubCategory = require("../models/subCategorySchema")
 const ApiFeature = require("../utils/apiFeature")
-
+const {uploadToCloudinary} = require("../utils/cloudinary")
 
 // @desc create product
 // @route /product
@@ -21,13 +21,15 @@ const createProduct = asyncHandler(async (req, res, next) => {
 
 //slugify makes a URL-friendly version of the name
 
-  if (req.files.image) {
-    req.body.images = req.files.image.map((file)=> file.filename);
-  }
-  if(req.files.imageCover){
-    req.body.imageCover = req.files.imageCover[0].filename
-  }
-
+if (req.file.image) {
+  const result = await uploadToCloudinary(req.file.buffer, "product");
+  req.body.images = result.secure_url;
+}
+  if (req.file.imageCover) {
+  const result = await uploadToCloudinary(req.file.buffer, "image cover");
+  req.body.imageCover = result.secure_url;
+}
+  
   const product = await Product.create(req.body);
 
   res.status(201).json({ data: product });

@@ -1,7 +1,8 @@
-
 const mongoose = require('mongoose');
 
-mongoose
-  .connect(process.env.URL_CONNECT_DB)
-  .then(() => console.log("db worked"))
-  .catch((err) => console.log(err));
+const connectDB = () => {
+  mongoose.set('sanitizeFilter', true);
+  return mongoose.connect(process.env.URL_CONNECT_DB);
+};
+
+module.exports = connectDB;

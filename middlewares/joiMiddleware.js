@@ -2,10 +2,11 @@ const {
   productValidation,
   brandValidation,
   subCategoryValidation,
-  joiUsersValidation,
+  joiregisterValidation,
   joiCouponValidation,
   joiReviewSchema,
   joiLoginValidation,
+
 } = require("../validationJoi/joiSchemaValidtor");
 const AppErrors = require("../utils/AppErrors");
 
@@ -26,7 +27,7 @@ exports.validationSubcategory = (req, res, next) => {
   next();
 };
 exports.validateRegisterJoi = (req, res, next) => {
-  const { error } = joiUsersValidation.validate(req.body);
+  const { error } = joiregisterValidation.validate(req.body);
   if (error) return next(new AppErrors(error.details[0].message, 400));
   next();
 };

@@ -6,9 +6,9 @@
 require("dotenv").config();
 const express = require("express");
 require("morgan");
-require("./config/db");
 
 
+const connectDB = require("./config/db");
 const corsOptions = require("./config/optionsCorse");
 const path = require("path");
 const rootPage = require("./routes/root.js");
@@ -26,7 +26,7 @@ const cartRouter = require("./routes/cartRouter.js");
 const orderRouter = require("./routes/orderRouter.js");
 const mongoose = require('mongoose'); 
 const rateLimit = require("express-rate-limit")
-const hpp = require('hpp');
+const qs = require('qs');
  const compression = require('compression')
 const cors = require("cors");
 const morgan = require("morgan");
@@ -34,7 +34,9 @@ const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean')
 
 const app = express();
-const port = 5500;
+const port = process.env.PORT || 5000;
+
+app.set("trust proxy", 1);
 
 //  middlewere
 
@@ -45,14 +47,17 @@ app.use(cors(corsOptions));
 app.use(express.json({limit: "20kb"}));
 app.use(express.urlencoded({ extended: true, limit: "20kb"}));
 
-// To remove data using these defaults:
-app.use(mongoSanitize());
+
 
 // make sure this comes before any routes
-app.use(xss())
-
-app.use(hpp());
- // app.set('query parser', 'extended');
+// app.use(xss())
+// to prevent injection query
+app.set('query parser', (str) => {
+  return qs.parse(str, {
+    duplicates: 'last' 
+  });
+});
+ 
 app.use(express.static(path.join(__dirname, "public")));
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
@@ -104,15 +109,23 @@ app.use((err, req, res, next) => {
   });
 });
 
+if (process.env.NODE_ENV !== "production") {
+  connectDB()
+    .then(() => {
+      console.log("db worked");
+      app.listen(port, () => {
+        console.log(`server work at port ${port}`);
+      });
+    })
+    .catch((err) => {
+      console.log("DB connection error:", err);
+    });
+}
 
-mongoose.connection.once("open", ()=> {
-  console.log("db worked");
-  app.listen(port, () => {
-    console.log(`server work at port ${port}`);
-  })
-})
     
 mongoose.connection.on("error",(err)=> {
   console.log(err)
 })
+
+module.exports = app;
 
